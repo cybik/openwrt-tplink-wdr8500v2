@@ -90,10 +90,10 @@
 &spi0 {
 	status = "okay";
 
-	w25q40@0 {
+	flash@0 {
 		compatible = "jedec,spi-nor";
 		reg = <0>;
-		spi-max-frequency = <3125000>;
+		spi-max-frequency = <33000000>;
 
 		partitions {
 			compatible = "fixed-partitions";
@@ -136,11 +136,10 @@
 		};
 	};
 
-	w25q128@1 {
+	flash@1 {
 		compatible = "jedec,spi-nor";
 		reg = <1>;
-		// XXX empiric value to obtain actual 10MHz SCK at the chip
-		spi-max-frequency = <3125000>;
+		spi-max-frequency = <33000000>;
 
 		partitions {
 			compatible = "fixed-partitions";

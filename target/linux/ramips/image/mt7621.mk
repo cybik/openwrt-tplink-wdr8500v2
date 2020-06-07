@@ -81,15 +81,9 @@ define Build/iodata-mstc-header
 	)
 endef
 
-define Build/netis-tail
-	echo -n $(1) >> $@
-	echo -n $(UIMAGE_NAME)-yun | $(STAGING_DIR_HOST)/bin/mkhash md5 | \
-		sed 's/../\\\\x&/g' | xargs echo -ne >> $@
-endef
-
 define Build/ubnt-erx-factory-image
 	if [ -e $(KDIR)/tmp/$(KERNEL_INITRAMFS_IMAGE) -a "$$(stat -c%s $@)" -lt "$(KERNEL_SIZE)" ]; then \
-		echo '21001:6' > $(1).compat; \
+		echo '21001:7' > $(1).compat; \
 		$(TAR) -cf $(1) --transform='s/^.*/compat/' $(1).compat; \
 		\
 		$(TAR) -rf $(1) --transform='s/^.*/vmlinux.tmp/' $(KDIR)/tmp/$(KERNEL_INITRAMFS_IMAGE); \
@@ -166,7 +160,7 @@ define Device/asus_rt-ac65p
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
 	check-size
-  DEVICE_PACKAGES := kmod-usb3 kmod-mt7615e wpad-basic uboot-envtools
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7615e kmod-mt7615-firmware wpad-basic uboot-envtools
 endef
 TARGET_DEVICES += asus_rt-ac65p
 
@@ -182,7 +176,7 @@ define Device/asus_rt-ac85p
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
 	check-size
-  DEVICE_PACKAGES := kmod-usb3 kmod-mt7615e wpad-basic uboot-envtools
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7615e kmod-mt7615-firmware wpad-basic uboot-envtools
 endef
 TARGET_DEVICES += asus_rt-ac85p
 
@@ -202,8 +196,10 @@ define Device/buffalo_wsr-2533dhpl
   IMAGE_SIZE := 7936k
   DEVICE_VENDOR := Buffalo
   DEVICE_MODEL := WSR-2533DHPL
+  DEVICE_ALT0_VENDOR := Buffalo
+  DEVICE_ALT0_MODEL := WSR-2533DHP
   IMAGE/sysupgrade.bin := trx | pad-rootfs | append-metadata
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += buffalo_wsr-2533dhpl
 
@@ -261,7 +257,7 @@ define Device/edimax_ra21s
   IMAGES += factory.bin
   IMAGE/factory.bin := $$(sysupgrade_bin) | check-size | \
 	elx-header 02020040 8844A2D168B45A2D
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += edimax_ra21s
 
@@ -272,7 +268,7 @@ define Device/edimax_rg21s
   IMAGES += factory.bin
   IMAGE/factory.bin := $$(sysupgrade_bin) | check-size | \
 	elx-header 02020038 8844A2D168B45A2D
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += edimax_rg21s
 
@@ -283,7 +279,7 @@ define Device/elecom_wrc-1167ghbk2-s
   IMAGES += factory.bin
   IMAGE/factory.bin := $$(sysupgrade_bin) | check-size | \
 	elecom-wrc-factory WRC-1167GHBK2-S 0.00
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += elecom_wrc-1167ghbk2-s
 
@@ -386,9 +382,9 @@ define Device/iodata_wn-ax1167gr2
   $(Device/iodata_nand)
   UIMAGE_MAGIC := 0x434f4d42
   DEVICE_MODEL := WN-AX1167GR2
-  KERNEL_INITRAMFS := $(KERNEL_DTB) | custom-initramfs-uimage 3.10(XBC.1)b10 | \
-	iodata-mstc-header
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  KERNEL_INITRAMFS := $(KERNEL_DTB) | loader-kernel | lzma | \
+	custom-initramfs-uimage 3.10(XBC.1)b10 | iodata-mstc-header
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += iodata_wn-ax1167gr2
 
@@ -396,9 +392,9 @@ define Device/iodata_wn-ax2033gr
   $(Device/iodata_nand)
   UIMAGE_MAGIC := 0x434f4d42
   DEVICE_MODEL := WN-AX2033GR
-  KERNEL_INITRAMFS := $(KERNEL_DTB) | custom-initramfs-uimage 3.10(VST.1)C10 | \
-	iodata-mstc-header
-  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615e wpad-basic
+  KERNEL_INITRAMFS := $(KERNEL_DTB) | loader-kernel | lzma | \
+	custom-initramfs-uimage 3.10(VST.1)C10 | iodata-mstc-header
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += iodata_wn-ax2033gr
 
@@ -406,9 +402,9 @@ define Device/iodata_wn-dx1167r
   $(Device/iodata_nand)
   UIMAGE_MAGIC := 0x434f4d43
   DEVICE_MODEL := WN-DX1167R
-  KERNEL_INITRAMFS := $(KERNEL_DTB) | custom-initramfs-uimage 3.10(XIK.1)b10 | \
-	iodata-mstc-header
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  KERNEL_INITRAMFS := $(KERNEL_DTB) | loader-kernel | lzma | \
+	custom-initramfs-uimage 3.10(XIK.1)b10 | iodata-mstc-header
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += iodata_wn-dx1167r
 
@@ -429,7 +425,7 @@ define Device/iodata_wnpr2600g
   IMAGES += factory.bin
   IMAGE/factory.bin := $$(sysupgrade_bin) | check-size | \
 	elx-header 0104003a 8844A2D168B45A2D
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += iodata_wnpr2600g
 
@@ -438,7 +434,7 @@ define Device/iptime_a6ns-m
   UIMAGE_NAME := a6nm
   DEVICE_VENDOR := ipTIME
   DEVICE_MODEL := A6ns-M
-  DEVICE_PACKAGES := kmod-mt7615e kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
 endef
 TARGET_DEVICES += iptime_a6ns-m
 
@@ -447,7 +443,7 @@ define Device/iptime_a8004t
   UIMAGE_NAME := a8004t
   DEVICE_VENDOR := ipTIME
   DEVICE_MODEL := A8004T
-  DEVICE_PACKAGES := kmod-mt7615e kmod-usb3 wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3 wpad-basic
 endef
 TARGET_DEVICES += iptime_a8004t
 
@@ -458,7 +454,7 @@ define Device/jcg_jhr-ac876m
   JCG_MAXSIZE := 16064k
   DEVICE_VENDOR := JCG
   DEVICE_MODEL := JHR-AC876M
-  DEVICE_PACKAGES := kmod-mt7615e kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3 kmod-usb-ledtrig-usbport wpad-basic
 endef
 TARGET_DEVICES += jcg_jhr-ac876m
 
@@ -472,6 +468,24 @@ define Device/lenovo_newifi-d1
   SUPPORTED_DEVICES += newifi-d1
 endef
 TARGET_DEVICES += lenovo_newifi-d1
+
+define Device/linksys_ea7500-v2
+  $(Device/uimage-lzma-loader)
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_SIZE := 4096k
+  IMAGE_SIZE := 36864k
+  DEVICE_VENDOR := Linksys
+  DEVICE_MODEL := EA7500
+  DEVICE_VARIANT := v2
+  DEVICE_PACKAGES := kmod-usb3 kmod-mt7615e kmod-mt7615-firmware wpad-basic uboot-envtools
+  UBINIZE_OPTS := -E 5
+  IMAGES := sysupgrade.bin factory.bin
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata | check-size
+  IMAGE/factory.bin := append-kernel | pad-to $$$$(KERNEL_SIZE) | \
+	append-ubi | check-size | linksys-image type=EA7500v2
+endef
+TARGET_DEVICES += linksys_ea7500-v2
 
 define Device/linksys_re6500
   IMAGE_SIZE := 7872k
@@ -603,7 +617,7 @@ define Device/netgear_r6260
   SERCOMM_HWVER := A001
   SERCOMM_SWVER := 0x0052
   IMAGE_SIZE := 40960k
-  DEVICE_PACKAGES += kmod-mt7615e
+  DEVICE_PACKAGES += kmod-mt7615e kmod-mt7615-firmware
 endef
 TARGET_DEVICES += netgear_r6260
 
@@ -615,7 +629,7 @@ define Device/netgear_r6350
   SERCOMM_HWVER := A001
   SERCOMM_SWVER := 0x0052
   IMAGE_SIZE := 40960k
-  DEVICE_PACKAGES += kmod-mt7615e
+  DEVICE_PACKAGES += kmod-mt7615e kmod-mt7615-firmware
 endef
 TARGET_DEVICES += netgear_r6350
 
@@ -634,7 +648,7 @@ define Device/netgear_r6700-v2
   SERCOMM_HWVER := A001
   SERCOMM_SWVER := 0x1032
   IMAGE_SIZE := 40960k
-  DEVICE_PACKAGES += kmod-mt7615e
+  DEVICE_PACKAGES += kmod-mt7615e kmod-mt7615-firmware
 endef
 TARGET_DEVICES += netgear_r6700-v2
 
@@ -646,7 +660,7 @@ define Device/netgear_r6800
   SERCOMM_HWVER := A001
   SERCOMM_SWVER := 0x0062
   IMAGE_SIZE := 40960k
-  DEVICE_PACKAGES += kmod-mt7615e
+  DEVICE_PACKAGES += kmod-mt7615e kmod-mt7615-firmware
 endef
 TARGET_DEVICES += netgear_r6800
 
@@ -658,7 +672,7 @@ define Device/netgear_r6850
   SERCOMM_HWVER := A001
   SERCOMM_SWVER := 0x0052
   IMAGE_SIZE := 40960k
-  DEVICE_PACKAGES += kmod-mt7615e
+  DEVICE_PACKAGES += kmod-mt7615e kmod-mt7615-firmware
 endef
 TARGET_DEVICES += netgear_r6850
 
@@ -711,7 +725,7 @@ define Device/phicomm_k2p
   DEVICE_ALT0_VENDOR := Phicomm
   DEVICE_ALT0_MODEL := KE 2P
   SUPPORTED_DEVICES += k2p
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += phicomm_k2p
 
@@ -767,7 +781,7 @@ define Device/totolink_a7000r
   UIMAGE_NAME := C8340R1C-9999
   DEVICE_VENDOR := TOTOLINK
   DEVICE_MODEL := A7000R
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += totolink_a7000r
 
@@ -775,7 +789,7 @@ define Device/adslr_g7
   IMAGE_SIZE := 16064k
   DEVICE_VENDOR := ADSLR
   DEVICE_MODEL := G7
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
 endef
 TARGET_DEVICES += adslr_g7
 
@@ -794,7 +808,7 @@ define Device/tplink_re650-v1
   $(Device/tplink-safeloader)
   DEVICE_MODEL := RE650
   DEVICE_VARIANT := v1
-  DEVICE_PACKAGES := kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware wpad-basic
   TPLINK_BOARD_ID := RE650-V1
   IMAGE_SIZE := 14208k
 endef
@@ -829,7 +843,7 @@ TARGET_DEVICES += ubnt_edgerouter-x-sfp
 define Device/ubnt_unifi-nanohd
   DEVICE_VENDOR := Ubiquiti
   DEVICE_MODEL := UniFi nanoHD
-  DEVICE_PACKAGES += kmod-mt7603 kmod-mt7615e wpad-basic
+  DEVICE_PACKAGES += kmod-mt7603 kmod-mt7615e kmod-mt7615-firmware wpad-basic
   IMAGE_SIZE := 15552k
 endef
 TARGET_DEVICES += ubnt_unifi-nanohd
@@ -923,10 +937,27 @@ define Device/xiaomi_mir3p
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
   IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | \
 	check-size
-  DEVICE_PACKAGES := kmod-mt7615e kmod-usb3 kmod-usb-ledtrig-usbport \
+  DEVICE_PACKAGES := kmod-mt7615e kmod-mt7615-firmware kmod-usb3 kmod-usb-ledtrig-usbport \
 	wpad-basic uboot-envtools
 endef
 TARGET_DEVICES += xiaomi_mir3p
+
+define Device/xiaomi_redmi-router-ac2100
+  $(Device/uimage-lzma-loader)
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_SIZE := 4096k
+  IMAGE_SIZE := 124416k
+  UBINIZE_OPTS := -E 5
+  IMAGES += kernel1.bin rootfs0.bin
+  IMAGE/kernel1.bin := append-kernel
+  IMAGE/rootfs0.bin := append-ubi | check-size
+  IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
+  DEVICE_VENDOR := Xiaomi
+  DEVICE_MODEL := Redmi Router AC2100
+  DEVICE_PACKAGES := kmod-mt7603 kmod-mt7615e kmod-mt7615-firmware wpad-basic uboot-envtools
+endef
+TARGET_DEVICES += xiaomi_redmi-router-ac2100
 
 define Device/xiaoyu_xy-c5
   IMAGE_SIZE := 32448k
