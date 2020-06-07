@@ -121,18 +121,19 @@
 
 &mdio0 {
 	status = "okay";
-	phy-mask = <0x1d>;
+
+	phy-mask = <0x21>
+
 };
 
 &eth0 {
 	status = "okay";
-	phy-mode = "rgmii";
-	mtd-mac-address = <&factory_info 0xd>;
+
 	pll-data = <0x56000000 0x00000101 0x00001616>;
-	fixed-link {
-		speed = <1000>;
-		full-duplex;
-	};
+
+	phy-mode = "sgmii";
+	mtd-mac-address = <&factory_info 0xd>;
+
 };
 
 &wmac {
@@ -141,3 +142,4 @@
 	mtd-cal-data = <&art 0x0>;
 	mtd-mac-address = <&factory_info 0xd>;
 };
+
