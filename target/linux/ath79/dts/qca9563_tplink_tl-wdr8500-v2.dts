@@ -54,13 +54,6 @@
 			debounce-interval = <60>;
 		};
 	};
-
-	rtkgsw {
-		compatible = "realtek,rtk-gsw";
-		realtek,mdio = <&mdio0>;
-		realtek,reset-pin = <&rst 22>;
-		reg = <0x1d>;
-	};
 };
 
 &pcie {
@@ -121,9 +114,7 @@
 
 &mdio0 {
 	status = "okay";
-
-	phy-mask = <0x21>;
-
+	compatible = "qca,realtek-mdio";
 };
 
 &eth0 {
